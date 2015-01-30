@@ -6,7 +6,7 @@
 #define NODE_VERSION_REVISION	5U
 #define NODE_VERSION_INTERNAL   0U
 
-#define NODE_VERSION	"NodeMCU 0.9.5"
+#define NODE_VERSION	"NodeMCU 0.9.5 Servo "
 #define BUILD_DATE	    "build 20150127"
 
 // #define FLASH_512K
@@ -65,6 +65,7 @@
 #define LUA_USE_MODULES_OW
 #define LUA_USE_MODULES_BIT
 #define LUA_USE_MODULES_MQTT
+#define LUA_USE_MODULES_SERVO
 #endif /* LUA_USE_MODULES */
 
 // #define LUA_NUMBER_INTEGRAL

@@ -117,6 +117,14 @@
 #define ROM_MODULES_BIT
 #endif
 
+#if defined(LUA_USE_MODULES_SERVO)
+#define MODULES_SERVO       "servo"
+#define ROM_MODULES_SERVO   \
+    _ROM(MODULES_SERVO, luaopen_servo, servo_map)
+#else
+#define ROM_MODULES_SERVO
+#endif
+
 #define LUA_MODULES_ROM      \
         ROM_MODULES_GPIO    \
         ROM_MODULES_PWM		\
@@ -131,7 +139,8 @@
         ROM_MODULES_ADC     \
         ROM_MODULES_UART    \
         ROM_MODULES_OW      \
-        ROM_MODULES_BIT
+        ROM_MODULES_BIT		\
+		ROM_MODULES_SERVO
 
 #endif
 

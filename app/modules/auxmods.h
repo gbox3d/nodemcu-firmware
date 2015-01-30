@@ -73,6 +73,9 @@ LUALIB_API int ( luaopen_file )( lua_State *L );
 #define AUXLIB_OW      "ow"
 LUALIB_API int ( luaopen_ow )( lua_State *L );
 
+#define AUXLIB_SERVO      "servo"
+LUALIB_API int ( luaopen_servo )( lua_State *L );
+
 // Helper macros
 #define MOD_CHECK_ID( mod, id )\
   if( !platform_ ## mod ## _exists( id ) )\
