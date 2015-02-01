@@ -7,7 +7,7 @@
 #define NODE_VERSION_INTERNAL   0U
 
 #define NODE_VERSION	"NodeMCU 0.9.5 Servo "
-#define BUILD_DATE	    "build 20150127"
+#define BUILD_DATE	    "build 20150201"
 
 // #define FLASH_512K
 // #define FLASH_1M

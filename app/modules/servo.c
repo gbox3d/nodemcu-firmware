@@ -15,13 +15,16 @@
 
 
 
-
 static os_timer_t servo_timer;
 
-static unsigned servo_pins[4] = {0,0,0,0};
-static unsigned servo_pulse_lenght[4] = {1500,1500,1500,1500};
-static unsigned servo_loop_counter = 0;
+static int servo_pins[4] = {-1,-1,-1,-1};
+static int servo_pulse_lenght[4] = {1500,1500,1500,1500};
 
+static unsigned current_servo = 0;
+static int next_servo[4] = {1,2,3,0};
+static int time_to_next_pulse[4] = {5,5,5,5};
+
+static unsigned run = 0;
 
 
 /*
@@ -35,21 +38,70 @@ void debug(char *dataPtr)
 }
 */
 
-
-
-
-servo_timer_tick(void) // servo timer function, called every 5ms for one from 4 servos
+int find_times_between_pulses(void)
 {
-	if (servo_pins[servo_loop_counter] != 0)
+	int tmp_time,find,i,ii,finded;
+
+	finded = 0;
+	for (i = 0 ; i < 4; i++)
 	{
-		DIRECT_WRITE_HIGH(servo_pins[servo_loop_counter]);	// drive output high
-		os_delay_us(servo_pulse_lenght[servo_loop_counter]);
-		DIRECT_WRITE_LOW(servo_pins[servo_loop_counter]);
+	  find = 0;
+	  tmp_time = 5;
+	  for (ii = 0 ; ii < 4; ii++)
+	  {
+			if (servo_pins[(ii+i+1)%4] == (-1) && find == 0)
+			{
+				tmp_time+=5;
+			}
+			else
+			{
+				find = 1;
+				next_servo[i] = (ii+i+1)%4;
+				time_to_next_pulse[i] = tmp_time;
+				break;
+			}
+		}
+		finded += find;
 	}
 
-	servo_loop_counter++;
-	if(servo_loop_counter >= 4)
-		servo_loop_counter = 0;
+/*
+	for (i = 0 ; i < 4; i++)
+	{
+		os_sprintf(debug_buffer, "id %d next servo:%d,time%d\r\n",i,next_servo[i],time_to_next_pulse[i]);
+		debug(debug_buffer);
+	}
+*/
+
+return finded;
+}
+
+
+
+
+servo_timer_tick(void) // servo timer function
+{
+	if (run == 1 && time_to_next_pulse[current_servo] >= 0)
+	{
+		os_timer_disarm(&servo_timer); // dis_arm the timer
+		os_timer_setfn(&servo_timer, (os_timer_func_t *)servo_timer_tick, NULL); // set the timer function, dot get os_timer_func_t to force function convert
+		os_timer_arm(&servo_timer, time_to_next_pulse[current_servo], 1); // arm the timer every 5ms and repeat
+
+		if (servo_pins[current_servo] >= 0)
+		{
+			DIRECT_WRITE_HIGH(servo_pins[current_servo]);	// drive output high
+			os_delay_us(servo_pulse_lenght[current_servo]);
+			DIRECT_WRITE_LOW(servo_pins[current_servo]);	// drive output low
+		}
+
+		//os_sprintf(debug_buffer, "id=%d   time=%d   next=%d \r\n",current_servo,time_to_next_pulse[current_servo],next_servo[current_servo]);
+		//debug(debug_buffer);
+
+		current_servo = next_servo[current_servo];
+	}
+	else
+	{
+		os_timer_disarm(&servo_timer); // dis_arm the timer
+	}
 }
 
 
@@ -78,15 +130,27 @@ static int servo_setup( lua_State* L )
 	  servo_pins[id] = pin;
 	  servo_pulse_lenght[id] = default_pulse;
 
-	  if (servo_pins[id] != 0)
+
+	  if (find_times_between_pulses() > 0)
 	  {
-		  DIRECT_WRITE_LOW(pin);
-		  DIRECT_MODE_OUTPUT(pin);
+		  run = 1;
+
+		  if (servo_pins[id] != 0)
+		  {
+			  DIRECT_WRITE_LOW(pin);
+		  	  DIRECT_MODE_OUTPUT(pin);
+		  }
+
+		  os_timer_disarm(&servo_timer); // dis_arm the timer
+		  os_timer_setfn(&servo_timer, (os_timer_func_t *)servo_timer_tick, NULL); // set the timer function, dot get os_timer_func_t to force function convert
+		  os_timer_arm(&servo_timer, time_to_next_pulse[current_servo], 1); // arm the timer every 5ms and repeat
+	  }
+	  else
+	  {
+		  run = 0;
+		  os_timer_disarm(&servo_timer); // dis_arm the timer
 	  }
 
-	  os_timer_disarm(&servo_timer); // dis_arm the timer
-	  os_timer_setfn(&servo_timer, (os_timer_func_t *)servo_timer_tick, NULL); // set the timer function, dot get os_timer_func_t to force function convert
-	  os_timer_arm(&servo_timer, 5, 1); // arm the timer every 5ms and repeat
   }
 
   return 1;
@@ -125,7 +189,28 @@ static int servo_position( lua_State* L )
 // Lua: stop()
 static int servo_stop( lua_State* L )
 {
-  os_timer_disarm(&servo_timer); // dis_arm the timer
+	unsigned id;
+
+	id = luaL_checkinteger( L, 1 );
+	if (id > 3)
+		return luaL_error( L, "wrong id, must be 0-3" );
+
+	servo_pins[id] = -1;
+
+	if (find_times_between_pulses() > 0)
+	{
+	  run = 1;
+
+	  os_timer_disarm(&servo_timer); // dis_arm the timer
+	  os_timer_setfn(&servo_timer, (os_timer_func_t *)servo_timer_tick, NULL); // set the timer function, dot get os_timer_func_t to force function convert
+	  os_timer_arm(&servo_timer, time_to_next_pulse[current_servo], 1); // arm the timer every 5ms and repeat
+	}
+	else
+	{
+	  run = 0;
+	  os_timer_disarm(&servo_timer); // dis_arm the timer
+	}
+
   return 1;
 }
 
