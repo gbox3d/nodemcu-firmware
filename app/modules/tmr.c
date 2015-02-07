@@ -9,13 +9,6 @@
 
 #include "c_types.h"
 
-#define noInterrupts os_intr_lock
-#define interrupts os_intr_unlock
-#define DIRECT_WRITE_LOW(pin)    (GPIO_OUTPUT_SET(GPIO_ID_PIN(pin_num[pin]), 0))
-#define DIRECT_WRITE_HIGH(pin)   (GPIO_OUTPUT_SET(GPIO_ID_PIN(pin_num[pin]), 1))
-#define DIRECT_MODE_OUTPUT(pin)	 platform_gpio_mode(pin,PLATFORM_GPIO_OUTPUT,PLATFORM_GPIO_PULLUP)
-
-
 static os_timer_t alarm_timer[NUM_TMR];
 static int alarm_timer_cb_ref[NUM_TMR] = {LUA_NOREF,LUA_NOREF,LUA_NOREF,LUA_NOREF,LUA_NOREF,LUA_NOREF,LUA_NOREF};
 
@@ -176,36 +169,6 @@ static int tmr_time( lua_State* L )
   return 1; 
 }
 
-
-
-// Lua: servo_pulse( us , pin )
-static int tmr_servo_pulse( lua_State* L )
-{
-  s32 us;
-  unsigned pin;
-
-  us = luaL_checkinteger( L, 1 );
-  pin = luaL_checkinteger( L, 2 );
-  MOD_CHECK_ID( gpio, pin );
-
-  if ( us <= 0 )
-    return luaL_error( L, "wrong arg range" );
-
-  if ( us >= 1000000 )
-      return luaL_error( L, "too long delay" );
-
-  DIRECT_MODE_OUTPUT(pin);	// drive output
-  //noInterrupts();
-  DIRECT_WRITE_HIGH(pin);	// drive output high
-  os_delay_us(us);
-  DIRECT_WRITE_LOW(pin);
-  //interrupts();
-  return 0;
-}
-
-
-
-
 // Module function map
 #define MIN_OPT_LEVEL 2
 #include "lrodefs.h"
@@ -217,7 +180,6 @@ const LUA_REG_TYPE tmr_map[] =
   { LSTRKEY( "stop" ), LFUNCVAL( tmr_stop ) },
   { LSTRKEY( "wdclr" ), LFUNCVAL( tmr_wdclr ) },
   { LSTRKEY( "time" ), LFUNCVAL( tmr_time ) },
-  { LSTRKEY( "servo_pulse" ), LFUNCVAL( tmr_servo_pulse ) },
 #if LUA_OPTIMIZE_MEMORY > 0
 
 #endif

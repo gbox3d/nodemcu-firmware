@@ -6,8 +6,8 @@
 #define NODE_VERSION_REVISION	5U
 #define NODE_VERSION_INTERNAL   0U
 
-#define NODE_VERSION	"NodeMCU 0.9.5 Servo "
-#define BUILD_DATE	    "build 20150201"
+#define NODE_VERSION	"NodeMCU 0.9.5"
+#define BUILD_DATE	    "build 20150127"
 
 // #define FLASH_512K
 // #define FLASH_1M
@@ -17,10 +17,9 @@
 // #define DEVELOP_VERSION
 #define FULL_VERSION_FOR_USER
 
-#ifdef DEVELOP_VERSION
-
 #define USE_OPTIMIZE_PRINTF
 
+#ifdef DEVELOP_VERSION
 #define NODE_DEBUG
 #endif	/* DEVELOP_VERSION */
 
@@ -64,7 +63,8 @@
 #define LUA_USE_MODULES_UART
 #define LUA_USE_MODULES_OW
 #define LUA_USE_MODULES_BIT
-#define LUA_USE_MODULES_MQTT
+//#define LUA_USE_MODULES_MQTT
+#define LUA_USE_MODULES_SOFTUART
 #define LUA_USE_MODULES_SERVO
 #endif /* LUA_USE_MODULES */
 

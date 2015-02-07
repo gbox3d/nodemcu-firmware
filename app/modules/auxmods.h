@@ -25,6 +25,9 @@ LUALIB_API int ( luaopen_pd )( lua_State *L );
 #define AUXLIB_UART     "uart"
 LUALIB_API int ( luaopen_uart )( lua_State *L );
 
+#define AUXLIB_SOFTUART "softuart"
+LUALIB_API int ( luaopen_softuart )( lua_State *L );
+
 #define AUXLIB_TERM     "term"
 LUALIB_API int ( luaopen_term )( lua_State *L );
 
