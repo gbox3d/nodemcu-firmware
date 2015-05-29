@@ -1,4 +1,5 @@
 // Module for software serial
+// gbox3d custom 2015.5.29 
 
 //#include "lua.h"
 #include "lualib.h"
@@ -28,15 +29,19 @@ static inline u8 chbit(u8 data, u8 bit)
 }
 
 // Function for printing individual characters
-static int soft_uart_putchar_c(u8 pin, unsigned bit_time, char data)
+static int soft_uart_putchar_c(u8 pin, unsigned _bit_time, char data)
 {
 	unsigned i;
 	unsigned start_time = 0x7FFFFFFF & system_get_time();
-
+//
+//gbox3d custom
+	unsigned bit_time = _bit_time/6;
+////
 	//Start Bit
 	GPIO_OUTPUT_SET(GPIO_ID_PIN(pin_num[pin]), 0);
 	for(i = 0; i <= 8; i ++ )
 	{
+		//while ((0x7FFFFFFF & system_get_time()) < (start_time + (bit_time*(i+1))))
 		while ((0x7FFFFFFF & system_get_time()) < (start_time + (bit_time*(i+1))))
 		{
 			//If system timer overflow, escape from while loop
@@ -54,7 +59,8 @@ static int soft_uart_putchar_c(u8 pin, unsigned bit_time, char data)
 	GPIO_OUTPUT_SET(GPIO_ID_PIN(pin_num[pin]), 1);
 
 	// Delay after byte, for new sync
-	os_delay_us(bit_time*6);
+	//os_delay_us(bit_time*6);
+	os_delay_us(_bit_time);
 
 	return 1;
 }
@@ -74,16 +80,18 @@ static int softuart_write( lua_State* L )
   MOD_CHECK_ID( gpio, pin );
 
   baudrate = luaL_checkinteger( L, 2 );
-  if( baudrate > 57600 )
-          return luaL_error( L, "max baudrate is 57600" );
+  //if( baudrate > 57600 )
+  //        return luaL_error( L, "max baudrate is 57600" );
 
-  bit_time = (1000000 / baudrate);
+  //bit_time = (1000000 / baudrate);
+  bit_time = (6000000 / baudrate);
 
   if (pin >= 0)
   {
 	  DIRECT_WRITE_HIGH(pin);
 	  DIRECT_MODE_OUTPUT(pin);
-	  os_delay_us(bit_time*8);
+	  //os_delay_us(bit_time*8);
+	  os_delay_us((bit_time/6)*8);
   }
 
   for( s = 3; s <= total; s ++ )
