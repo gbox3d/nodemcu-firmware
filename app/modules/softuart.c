@@ -57,7 +57,7 @@ static int soft_uart_putchar_c(u8 pin, unsigned _bit_time, char data)
 
 	// Delay after byte, for new sync
 	//gbox3d *6 time = (b*4)+(b*2)=(b<<2)+(b<<1)
-	os_delay_us((_bit_time<<2+(_bit_time<<1));
+	os_delay_us((_bit_time<<2)+(_bit_time<<1));
 
 	return 1;
 }
