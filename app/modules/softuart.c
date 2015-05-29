@@ -33,12 +33,13 @@ static int soft_uart_putchar_c(u8 pin, unsigned _bit_time, char data)
 {
 	unsigned i;
 	unsigned start_time = 0x7FFFFFFF & system_get_time();
+	unsigned wait_time = start_time + (_bit_time*(i+1)/6));
 	//Start Bit
 	GPIO_OUTPUT_SET(GPIO_ID_PIN(pin_num[pin]), 0);
 	for(i = 0; i <= 8; i ++ )
 	{
 		//gbox3d custom
-		while ((0x7FFFFFFF & system_get_time()) < (start_time + (_bit_time*(i+1)/6)))
+		while ((0x7FFFFFFF & system_get_time()) < wait_time)
 		{
 			//If system timer overflow, escape from while loop
 			if ((0x7FFFFFFF & system_get_time()) < start_time){break;}
@@ -48,7 +49,8 @@ static int soft_uart_putchar_c(u8 pin, unsigned _bit_time, char data)
 
 	// Stop bit
 	//gbox3d custom
-	while ((0x7FFFFFFF & system_get_time()) < (start_time + (_bit_time*9/6)))
+	wait_time = start_time + (_bit_time*9/6);
+	while ((0x7FFFFFFF & system_get_time()) < wait_time)
 	{
 		//If system timer overflow, escape from while loop
 		if ((0x7FFFFFFF & system_get_time()) < start_time){break;}
