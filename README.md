@@ -1,5 +1,5 @@
 # **NodeMcu** #
-version 0.9.5
+version 0.9.5(east spring custom v0.0.1)
 ###A lua based firmware for wifi-soc esp8266
 Build on [ESP8266 sdk 0.9.5](http://bbs.espressif.com/viewtopic.php?f=5&t=154)<br />
 Lua core based on [eLua project](http://www.eluaproject.net/)<br />
@@ -28,6 +28,10 @@ Tencent QQ group: 309957875<br />
 - cross compiler
 
 # Change log
+
+2015-05-29<br/>
+now support 115200bps softuart.write
+
 2015-01-27<br />
 support floating point LUA.<br />
 use macro LUA_NUMBER_INTEGRAL in user_config.h control this feature.<br />
