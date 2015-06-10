@@ -79,6 +79,11 @@ LUALIB_API int ( luaopen_ow )( lua_State *L );
 #define AUXLIB_SERVO      "servo"
 LUALIB_API int ( luaopen_servo )( lua_State *L );
 
+//gbox3d 추가 20150610
+#define AUXLIB_CJSON      "cjson"
+LUALIB_API int ( luaopen_ow )( lua_State *L );
+
+
 // Helper macros
 #define MOD_CHECK_ID( mod, id )\
   if( !platform_ ## mod ## _exists( id ) )\

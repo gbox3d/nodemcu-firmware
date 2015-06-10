@@ -133,6 +133,16 @@
 #define ROM_MODULES_SERVO
 #endif
 
+
+#if defined(LUA_USE_MODULES_CJSON)
+#define MODULES_CJSON "cjson"
+#define ROM_MODULES_CJSON \
+    _ROM(MODULES_CJSON, luaopen_cjson, cjson_map)
+#else
+#define ROM_MODULES_CJSON
+#endif
+
+
 #define LUA_MODULES_ROM       \
         ROM_MODULES_GPIO      \
         ROM_MODULES_PWM		  \
@@ -149,7 +159,8 @@
 		ROM_MODULES_SOFTUART  \
         ROM_MODULES_OW        \
         ROM_MODULES_BIT		  \
-		ROM_MODULES_SERVO
+		ROM_MODULES_SERVO \
+		ROM_MODULES_CJSON
 
 #endif
 
